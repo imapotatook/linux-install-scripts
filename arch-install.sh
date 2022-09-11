@@ -3,7 +3,7 @@
 function ascii {
 
 	#Added ASCII Art cause why not                                                                                        
-	echo	' HI COOK :)                                                                                                      '
+	echo	' HI COOK :)     '
 
 }
 
@@ -132,7 +132,9 @@ function base {
 				ttf-hack \
                 intel-ucode \
                 btrfs-progs \
-				reflector
+				reflector \
+				dosfstools \
+				exfatprogs
 	genfstab -U /mnt >> /mnt/etc/fstab
 	cont
 }
@@ -147,35 +149,32 @@ function set-timezone {
 
 
 function install-gnome {
-	pacstrap /mnt gnome gnome-tweaks papirus-icon-theme
+	arch-chroot /mnt bash -c "pacman -S gnome gnome-tweaks papirus-icon-theme && exit"
 	arch-chroot /mnt bash -c "systemctl enable gdm && exit"
 	# Editing gdm's config for disabling Wayland as it does not play nicely with Nvidia
 	arch-chroot /mnt bash -c "sed -i 's/#W/W/' /etc/gdm/custom.conf && exit"
 }
-
-function install-deepin {
-	pacstrap /mnt deepin lightdm gedit
-	arch-chroot /mnt bash -c "systemctl enable lightdm && exit"
+function install-xfce {
+	arch-chroot /mnt bash -c "pacman -S xfce4 xfce4-goodies gstreamer0.10-base-plugins dbus gtk-engines gtk-engine-murrine gnome-themes-standard && exit" 
 }
-
 function install-kde {
-	pacstrap /mnt xorg plasma sddm plasma-wayland-protocols plasma-wayland-session
+	arch-chroot /mnt bash -c "pacman -S xorg plasma sddm plasma-wayland-protocols plasma-wayland-session && exit"
 	arch-chroot /mnt bash -c "systemctl enable sddm && exit"
-	pacstrap /mnt ark dolphin ffmpegthumbs gwenview kaccounts-integration kate kdialog kio-extras ksystemlog okular print-manager pipewire alacritty latte-dock htop vscodium zsh \
+	arch-chroot /mnt bash -c "pacman -S ark dolphin ffmpegthumbs gwenview kaccounts-integration kate kdialog khotkeys kio-extras ksystemlog okular print-manager pipewire alacritty latte-dock htop vscodium zsh \
 	ark audiocd-kio dolphin dolphin-plugins filelight kcalc kcron kdegraphics-thumbnailers kdenetwork-filesharing kdesdk-kioslaves kdesdk-thumbnailers kdialog \
-	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart zeroconf-ioslave
+	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart zeroconf-ioslave && exit"
 }
 
 function de {
 	echo -e "Choose a Desktop Environment to install: \n"
-	echo -e "1. GNOME \n2. Deepin \n3. KDE \n4. None"
+	echo -e "1. GNOME \n2. Xfce \n3. KDE \n4. None"
 	read -r -p "DE: " desktope
 	case "$desktope" in
 		1)
 			install-gnome
 			;;
 		2)
-			install-deepin
+			install-xfce
 			;;
 		3)
 			install-kde
@@ -188,14 +187,12 @@ function de {
 
 function installgrub {
 	read -r -p "Install GRUB bootloader? [y/N] " igrub
-	case "$igrub" in
-		[yY][eE][sS]|[yY])
-			echo -e "Installing GRUB.."
-			arch-chroot /mnt bash -c "grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch --removable && grub-mkconfig -o /boot/grub/grub.cfg && exit"
-			;;
-		*)
-			;;
-	esac
+	if [[ $igrub =~ ([nN][oO]|[nN])$ ]]; then
+		cont	 
+	else 
+		echo -e "Installing GRUB.."
+		arch-chroot /mnt bash -c "grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch --removable && grub-mkconfig -o /boot/grub/grub.cfg && exit"
+	fi
 	cont
 }
 
@@ -231,41 +228,13 @@ function archroot {
 	cont
 }
 
-function browser {
-	read -r -p "Install firefox? [y/N] " ff
-	case "$ff" in
-		[yY][eE][sS]|[yY])
-			pacstrap /mnt firefox
-			;;
-		*)
-			;;
-	esac
-	read -r -p "Install firefox nightly? (req chaotic-aur) [y/N]" ffn
-	case "$ffn" in
-	    [yY][eE][sS]|[yY])
-		    pacstrap /mnt firefox-nightly
-			;;
-        *)
-		    ;;
-	esac
-	read -r -p "Install chromium? [y/N] " chrom
-	case "$chrom" in
-		[yY][eE][sS]| [yY])
-			pacstrap /mnt chromium
-			;;
-		*)
-			;;
-	esac
-	cont
-}
-
 function install-amd {
-	pacstrap /mnt mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon
-	pacstrap /mnt libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau
+	arch-chroot /mnt bash -c "pacman -S mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon && exit"
+	arch-chroot /mnt bash -c "pacman -S libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau && exit"
 }
 function install-intel {
-	pacstrap /mnt pacman -S mesa lib32-mesa vulkan-intel lib32-vulkan-intel 
-	pacstrap /mnt libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau
+	arch-chroot /mnt bash -c "pacman -S mesa lib32-mesa vulkan-intel lib32-vulkan-intel && exit" 
+	arch-chroot /mnt bash -c "pacman -S libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau && exit"
 }
 function install-nvidia {
 	read -r -p "Do you want proprietary nvidia drivers? [y/N] " graphic
@@ -279,6 +248,49 @@ function install-nvidia {
 	cont
 }
 
+function install-firefox {
+	arch-chroot /mnt bash -c "pacman -S firefox && exit"
+}
+function install-firefoxn {
+	arch-chroot /mnt bash -c "pacman -S firefox-nightly && exit"
+}
+function install-librewolf {
+	arch-chroot /mnt bash -c "pacman -S librewolf && exit"
+}
+function install-google {
+	arch-chroot /mnt bash -c "pacman -S google-chrome && exit"
+}
+function install-ugchromium {
+	arch-chroot /mnt bash -c "pacman -S ungoogled-chromium && exit"
+}
+
+
+function browsers {
+	echo -e "Choose what browser you want to install \n"
+	echo -e "1. Firefox \n2. Firefox Nightly \n3. Librewolf \n4. Google Chrome \n5. Ungoogled Chromium \n6. None"
+	echo -e "you will need chaotic-aur installed for (firefox nightly, librewolf, ungoogled chromium)"
+	read -r -p "Browers [1/2/3/4/5/6]:" browser
+	case "$browser" in
+	    1)
+		    install-firefox
+			;;
+		2)
+		    install-firefoxn
+			;;
+		3)
+		    install-Librewolf
+			;;
+		4)
+		    install-Google
+			;;
+		5)
+		    install-ugchromium
+			;;
+		*)
+		    ;;
+	esac
+	cont
+}
 function graphics {
 	echo -e "Choose Graphic card drivers to install: \n"
 	echo -e "1. AMD \n2. Nvidia \n3. Intel \n4. None"
@@ -299,16 +311,48 @@ function graphics {
 	cont
 }
 
+function paru {
+	arch-chroot /mnt bash -c "pacman -S paru && exit"
+}
+
+function yay { 
+	arch-chroot /mnt bash -c "pacman -S yay && exit"
+}
+
+function aur-helper {
+	echo -e "choose which aur helper you want to install: \n"
+	echo -e "1. Paru \n2. Yay \n3. None"
+    read -r -p "aur hepler [1/2/3]: " aurhelp
+	case "$aurhelp" in
+	1)
+	    paru
+		;;
+	2)
+	    yay
+		;;
+	*)
+	    ;;
+	esac
+	cont 
+}
+
 function installsteam {
 	read -r -p "Do you want to install steam? [y/N] " isteam
 	case "$isteam" in
 		[yY][eE][sS]|[yY])
-			pacstrap /mnt steam steam-native-runtime
+			arch-chroot /mnt bash -c "pacman -S steam steam-native-runtime && exit"
 			;;
 		*)
 			;;
-    read -r -p "Do you want to install steam tinker launch? [y/N] "
 	esac
+        read -r -p "Do you want to install steam tinker launch? [y/N] " stl
+        case "$stl" in
+		    [yY][eE][sS]|[yY])
+		        arch-chroot /mnt bash -c "pacman -S steamtinkerlaunch && exit"
+			    ;;
+		    *)
+		        ;;	
+	    esac
 	cont
 }
 
@@ -324,15 +368,17 @@ function additional {
 }
 
 function chaotic-aur {
-	read -r -p "Do you want to add the Chaotic-aur repo [Y/n] " chaotic
-	case "$chaotic" in 
-	    [Yy][eE][sS]|[yY])
-		    arch-chroot /mnt bash -c "pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com && pacman-key --lsign-key FBA220DFC880C036 && exit" 
-			arch-chroot /mnt bash -c "pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst' && exit"
-			arch-chroot /mnt bash -c "echo '[chaotic-aur]' >> /etc/pacman.conf && echo Include = '/etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf && pacman -Sy && exit"
-	esac
+	read -r -p "Do you want to add the Chaotic-aur repo [y/N] " chaotic
+	if [[ $chaotic =~ ([nN][oO]|[nN])$ ]]; then
+	cont 
+	else
+	    arch-chroot /mnt bash -c "pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com && pacman-key --lsign-key FBA220DFC880C036 && exit" 
+		arch-chroot /mnt bash -c "pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst' && exit"
+		arch-chroot /mnt bash -c "echo '[chaotic-aur]' >> /etc/pacman.conf && echo Include = '/etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf && pacman -Sy && exit"
+	fi
 	cont
 }
+
 
 function full-installation {
 	set-time
@@ -341,13 +387,14 @@ function full-installation {
 	base
 	archroot
 	chaotic-aur
+	aur-helper
     set-timezone
 	de
 	installgrub
 	graphics
 	installsteam
 	additional
-	browser
+	browsers
 	echo "Installation complete. Reboot you lazy bastard."
 }
 
@@ -359,16 +406,17 @@ function step-installation {
 	echo "4. base installation"
 	echo "5. archroot"
 	echo "6. adding chaotic-aur repo"
-    echo "7. set-timezone"
-	echo "8. installing a Desktop Environment"
-	echo "9. installing grub"
-	echo "10. graphics drivers"
-	echo "11. installing steam"
-	echo "12. additional stuff"
-	echo "13. installing browsers"
+	echo "7. installing aur helper"
+    echo "8. set-timezone"
+	echo "9. installing a Desktop Environment"
+	echo "10. installing grub"
+	echo "11. graphics drivers"
+	echo "12. installing steam"
+	echo "13. additional stuff"
+	echo "14. installing browsers"
 	read -r -p "Enter the number of step : " stepno
 
-	array=(set-time partition mounting base archroot chaotic-aur set-timezone de installgrub graphics installsteam additional browser)
+	array=(set-time partition mounting base archroot chaotic-aur aur-helper set-timezone de installgrub graphics installsteam additional browsers)
 	#array=(ascii ascii ascii)
 	stepno=$((stepno-1))
 	while [ $stepno -lt ${#array[*]} ]
