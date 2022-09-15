@@ -161,8 +161,8 @@ function install-kde {
 	arch-chroot /mnt bash -c "pacman -S xorg plasma sddm plasma-wayland-protocols plasma-wayland-session && exit"
 	arch-chroot /mnt bash -c "systemctl enable sddm && exit"
 	arch-chroot /mnt bash -c "pacman -S ark dolphin ffmpegthumbs gwenview kaccounts-integration kate kdialog khotkeys kio-extras ksystemlog okular print-manager pipewire alacritty latte-dock htop vscodium zsh \
-	ark audiocd-kio dolphin dolphin-plugins filelight kcalc kcron kdegraphics-thumbnailers kdenetwork-filesharing kdesdk-kioslaves kdesdk-thumbnailers kdialog \
-	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart zeroconf-ioslave && exit"
+	ark audiocd-kio dolphin dolphin-plugins filelight kcalc kcron kdegraphics-thumbnailers kdenetwork-filesharing kdesdk-kio kdesdk-thumbnailers kdialog \
+	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart kio-zeroconf pipewire-zeroconf xdg-desktop-portal && exit"
 }
 
 function de {
@@ -186,7 +186,7 @@ function de {
 }
 
 function installgrub {
-	read -r -p "Install GRUB bootloader? [y/N] " igrub
+	read -r -p "Install GRUB bootloader? [Y/n	] " igrub
 	if [[ $igrub =~ ([nN][oO]|[nN])$ ]]; then
 		cont	 
 	else 
@@ -207,10 +207,10 @@ function archroot {
 	arch-chroot /mnt bash -c "echo $hname > /etc/hostname && echo 127.0.0.1	$hname > /etc/hosts && echo ::1	$hname >> /etc/hosts && echo 127.0.1.1	$hname.localdomain	$hname >> /etc/hosts && exit"
 
 	echo "Set Root password"
-	arch-chroot /mnt bash -c "passwd && useradd -mG wheel $uname && echo 'set user password' && passwd $uname && EDITOR=nano visudo && exit"
+	arch-chroot /mnt bash -c "passwd && useradd -mG wheel $uname && echo 'set user password' && passwd $uname && sed -i '85s/#/ /' /etc/sudoers && exit"
 
     echo "add btrfs module to mkinitcpio"
-    arch-chroot /mnt bash -c "nano /etc/mkinitcpio.conf && mkinitpio -P && exit"
+    arch-chroot /mnt bash -c "sed -i '7s/(/(btrfs/' /etc/mkinitcpio.conf && mkinitpio -P && exit"
 
 	echo -e "enabling services...\n"
 	arch-chroot /mnt bash -c "systemctl enable bluetooth && exit"
