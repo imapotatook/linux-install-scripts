@@ -1,12 +1,9 @@
 #!/bin/bash
 
 function ascii {
-
 	#Added ASCII Art cause why not                                                                                        
 	echo	' HI COOK :)     '
-
 }
-
 
 function cont {
 	read -r -p "[SUCCESS] Continue to next step? [Y/n] " cont
@@ -162,7 +159,7 @@ function install-kde {
 	arch-chroot /mnt bash -c "systemctl enable sddm && exit"
 	arch-chroot /mnt bash -c "pacman -S ark dolphin ffmpegthumbs gwenview kaccounts-integration kate kdialog khotkeys kio-extras ksystemlog okular print-manager pipewire alacritty latte-dock htop vscodium zsh \
 	ark audiocd-kio dolphin dolphin-plugins filelight kcalc kcron kdegraphics-thumbnailers kdenetwork-filesharing kdesdk-kio kdesdk-thumbnailers kdialog \
-	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart kio-zeroconf pipewire-zeroconf xdg-desktop-portal && exit"
+	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart kio-zeroconf pipewire-zeroconf xdg-desktop-portal kvantum wireplumber && exit"
 }
 
 function de {

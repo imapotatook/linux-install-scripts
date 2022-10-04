@@ -1,0 +1,75 @@
+#!/bin/bash
+
+
+function cont {
+	read -r -p "[SUCCESS] Continue to next step? [Y/n] " cont
+	case $cont in
+		[Nn][oO]|[nN] )
+			exit
+			;;
+		*)
+			;;
+	esac
+}
+
+function theme {
+    echo "which theme do you want"
+    echo -e "Choose which theme to install: \n"
+	echo -e "1. Gruvbox dark \n2. materia dark \n3. None"
+	read -r -p "Themes [1/2/3]: " themes
+	case "$drivers" in
+		1)
+			install-gruvd
+			;;
+		2)
+			install-materiad
+			;;
+		*)
+			;;
+	esac
+	cont
+}
+
+function full-installation {
+	theme
+	echo "Installation complete. Reboot you lazy bastard."
+}
+
+
+function step-installation {
+	echo "These steps are available for installion:"
+	echo "1. set-time"
+	read -r -p "Enter the number of step : " stepno
+
+	array=(set-time)
+	#array=(ascii ascii ascii)
+	stepno=$((stepno-1))
+	while [ $stepno -lt ${#array[*]} ]
+	do
+		${array[$stepno]}
+		stepno=$((stepno+1))
+	done
+}
+
+function main {
+	echo "1. Start full installation"
+	echo "2. Start from a specific step"
+	read -r -p "What would you like to do? [1/2] " what
+	case "$what" in
+		2)
+			step-installation
+			;;
+		*)
+			full-installation
+			;;
+	esac
+}
+
+read -r -p "Start Installation? [Y/n] " starti
+case "$starti" in
+	[nN][oO]|[nN])
+		;;
+	*)
+		main
+		;;
+esac
