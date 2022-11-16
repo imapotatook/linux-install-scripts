@@ -101,6 +101,8 @@ function base {
 				base \
 				diffutils \
 				e2fsprogs \
+				bluez \
+				bluez-utils \
 				inetutils \
 				less \
 				linux \
@@ -157,7 +159,7 @@ function install-xfce {
 function install-kde {
 	arch-chroot /mnt bash -c "pacman -S xorg plasma sddm plasma-wayland-protocols plasma-wayland-session && exit"
 	arch-chroot /mnt bash -c "systemctl enable sddm && exit"
-	arch-chroot /mnt bash -c "pacman -S ark dolphin ffmpegthumbs gwenview kaccounts-integration kate kdialog khotkeys kio-extras ksystemlog okular print-manager pipewire alacritty latte-dock htop vscodium zsh \
+	arch-chroot /mnt bash -c "pacman -S ark dolphin ffmpegthumbs libadwaita gnome-keyring gwenview kaccounts-integration kate kdialog khotkeys kio-extras ksystemlog okular print-manager pipewire alacritty latte-dock htop vscodium zsh \
 	ark audiocd-kio dolphin dolphin-plugins filelight kcalc kcron kdegraphics-thumbnailers kdenetwork-filesharing kdesdk-kio kdesdk-thumbnailers kdialog \
 	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart kio-zeroconf pipewire-zeroconf xdg-desktop-portal kvantum wireplumber && exit"
 }
@@ -183,7 +185,7 @@ function de {
 }
 
 function installgrub {
-	read -r -p "Install GRUB bootloader? [Y/n	] " igrub
+	read -r -p "Install GRUB bootloader? [Y/n] " igrub
 	if [[ $igrub =~ ([nN][oO]|[nN])$ ]]; then
 		cont	 
 	else 
@@ -207,7 +209,7 @@ function archroot {
 	arch-chroot /mnt bash -c "passwd && useradd -mG wheel $uname && echo 'set user password' && passwd $uname && sed -i '85s/#/ /' /etc/sudoers && exit"
 
     echo "add btrfs module to mkinitcpio"
-    arch-chroot /mnt bash -c "sed -i '7s/(/(btrfs/' /etc/mkinitcpio.conf && mkinitpio -P && exit"
+    arch-chroot /mnt bash -c "sed -i '7s/(/(btrfs/' /etc/mkinitcpio.conf && mkinitcpio -P && exit"
 
 	echo -e "enabling services...\n"
 	arch-chroot /mnt bash -c "systemctl enable bluetooth && exit"
@@ -234,15 +236,7 @@ function install-intel {
 	arch-chroot /mnt bash -c "pacman -S libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau && exit"
 }
 function install-nvidia {
-	read -r -p "Do you want proprietary nvidia drivers? [y/N] " graphic
-	case "$graphic" in
-		[yY][eE][sS]|[yY])
-			pacstrap /mnt nvidia nvidia-settings nvidia-utils lib32-nvidia-utils
-			;;
-		*)
-			;;
-	esac
-	cont
+	arch-chroot /mnt bash -c "pacman -S nvidia nvidia-settings nvidia-utils lib32-nvidia-utils && exit"	
 }
 
 function install-firefox {
