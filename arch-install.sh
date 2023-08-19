@@ -96,6 +96,7 @@ function base {
 	pacman -Syy	
 	pacman-key --init
 	pacman-key --populate
+	pacman -S wget --noconfirm
 	basestrap /mnt \
 				base \
 				openrc \
@@ -134,10 +135,9 @@ function base {
 				ttf-hack \
                 intel-ucode \
                 btrfs-progs \
-				reflector \
-				dosfstools \
-				exfatprogs
+				dosfstools 
 	fstabgen -U /mnt >> /mnt/etc/fstab
+	extra-repos
 	cont
 }
 
@@ -377,6 +377,39 @@ function chaotic-aur {
 		artix-chroot /mnt bash -c "echo '[chaotic-aur]' >> /etc/pacman.conf && echo Include = '/etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf && pacman -Sy && exit"
 	fi
 	cont
+}
+
+function extra-repos {
+	echo " 
+# Arch
+[extra]
+Include = /etc/pacman.d/mirrorlist-arch
+
+[community]
+Include = /etc/pacman.d/mirrorlist-arch
+
+[multilib]
+Include = /etc/pacman.d/mirrorlist-arch 
+
+[universe]
+Server = https://mirror.pascalpuffke.de/artix-universe/$arch
+Server = https://mirrors.qontinuum.space/artixlinux-universe/$arch
+Server = https://mirror1.cl.netactuate.com/artix/universe/$arch
+Server = https://ftp.crifo.org/artix-universe/$arch
+Server = https://artix.sakamoto.pl/universe/$arch
+Server = https://mirror1.artixlinux.org/universe/$arch
+Server = https://universe.artixlinux.org/$arch
+# TOR
+Server = http://rrtovkpcaxl6s2ommj5tigyxamzxaknasd74ecb5t5cdfnkodirjnwyd.onion/artixlinux/$arch
+
+[omniverse]
+Server = https://artix.sakamoto.pl/omniverse/$arch
+Server = https://eu-mirror.artixlinux.org/omniverse/$arch
+Server = https://omniverse.artixlinux.org/$arch" >> /mnt/etc/pacman.conf
+
+artix-chroot /mnt bash -c "pacman -S artix-archlinux-support && pacman -Sy && exit"
+wget https://github.com/archlinux/svntogit-packages/raw/packages/pacman-mirrorlist/trunk/mirrorlist -O /mnt/etc/pacman.d/mirrorlist-arch
+nano /mnt/etc/pacman.d/mirrorlist-arch
 }
 
 
