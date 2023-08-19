@@ -137,7 +137,7 @@ function base {
 				reflector \
 				dosfstools \
 				exfatprogs
-	genfstab -U /mnt >> /mnt/etc/fstab
+	fstabgen -U /mnt >> /mnt/etc/fstab
 	cont
 }
 
