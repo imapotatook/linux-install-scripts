@@ -18,8 +18,7 @@ function cont {
 
 function set-time {
 	echo "Setting time...."
-	# This command fixes different time reporting when dual booting with windows.
-	timedatectl set-local-rtc 1 --adjust-system-clock
+	rc-service ntpd start
 }
 
 function partition {
@@ -97,12 +96,15 @@ function base {
 	pacman -Syy	
 	pacman-key --init
 	pacman-key --populate
-	pacstrap /mnt \
+	basestrap /mnt \
 				base \
+				openrc \
+				elogind-openrc \
 				diffutils \
 				e2fsprogs \
 				bluez \
 				bluez-utils \
+				bluez-openrc \
 				inetutils \
 				less \
 				linux \
@@ -116,6 +118,7 @@ function base {
 				which \
 				base-devel \
 				networkmanager \
+				networkmanager-openrc \
 				sudo \
 				bash-completion \
 				git \
@@ -148,8 +151,8 @@ function set-timezone {
 
 
 function install-gnome {
-	arch-chroot /mnt bash -c "pacman -S gnome gnome-tweaks papirus-icon-theme && exit"
-	arch-chroot /mnt bash -c "systemctl enable gdm && exit"
+	arch-chroot /mnt bash -c "pacman -S gnome gdm-openrc gnome-tweaks papirus-icon-theme && exit"
+	arch-chroot /mnt bash -c "rc-update add gdm default && exit"
 	# Editing gdm's config for disabling Wayland as it does not play nicely with Nvidia
 	arch-chroot /mnt bash -c "sed -i 's/#W/W/' /etc/gdm/custom.conf && exit"
 }
@@ -157,8 +160,8 @@ function install-xfce {
 	arch-chroot /mnt bash -c "pacman -S xfce4 xfce4-goodies gstreamer0.10-base-plugins dbus gtk-engines gtk-engine-murrine gnome-themes-standard && exit" 
 }
 function install-kde {
-	arch-chroot /mnt bash -c "pacman -S xorg plasma sddm plasma-wayland-protocols plasma-wayland-session && exit"
-	arch-chroot /mnt bash -c "systemctl enable sddm && exit"
+	arch-chroot /mnt bash -c "pacman -S xorg plasma sddm sddm-openrc plasma-wayland-protocols plasma-wayland-session && exit"
+	arch-chroot /mnt bash -c "rc-update add sddm default && exit"
 	arch-chroot /mnt bash -c "pacman -S ark dolphin ffmpegthumbs libadwaita gnome-keyring gwenview kaccounts-integration kate kdialog khotkeys kio-extras ksystemlog okular print-manager pipewire alacritty latte-dock htop vscodium zsh \
 	ark audiocd-kio dolphin dolphin-plugins filelight kcalc kcron kdegraphics-thumbnailers kdenetwork-filesharing kdesdk-kio kdesdk-thumbnailers kdialog \
 	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart kio-zeroconf pipewire-zeroconf xdg-desktop-portal kvantum wireplumber && exit"
@@ -212,11 +215,11 @@ function archroot {
     arch-chroot /mnt bash -c "sed -i '7s/(/(btrfs/' /etc/mkinitcpio.conf && mkinitcpio -P && exit"
 
 	echo -e "enabling services...\n"
-	arch-chroot /mnt bash -c "systemctl enable bluetooth && exit"
-	arch-chroot /mnt bash -c "systemctl enable NetworkManager && exit"
+	arch-chroot /mnt bash -c "rc-update add bluetooth && exit"
+	arch-chroot /mnt bash -c "rc-update add NetworkManager default && exit"
 	
-	echo -e "enabling paccache timer...\n"
-	arch-chroot /mnt bash -c "systemctl enable paccache.timer && exit"
+	#echo -e "enabling paccache timer...\n"
+	#arch-chroot /mnt bash -c "systemctl enable paccache.timer && exit"
 
 	echo -e "Editing configuration files...\n"
 	# Enabling multilib in pacman
