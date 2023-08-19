@@ -166,9 +166,12 @@ function install-kde {
 	ark audiocd-kio dolphin dolphin-plugins filelight kcalc kcron kdegraphics-thumbnailers kdenetwork-filesharing kdesdk-kio kdesdk-thumbnailers kdialog \
 	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart kio-zeroconf pipewire-zeroconf xdg-desktop-portal kvantum wireplumber && exit"
 }
+function install-hyprland {
+	artix-chroot /mnt bash -c "pacman -S hyprland && exit"
+}
 
 function de {
-	echo -e "Choose a Desktop Environment to install: \n"
+	echo -e "Choose a Desktop Environment or Window Manager to install: \n"
 	echo -e "1. GNOME \n2. Xfce \n3. KDE \n4. None"
 	read -r -p "DE: " desktope
 	case "$desktope" in
@@ -180,6 +183,9 @@ function de {
 			;;
 		3)
 			install-kde
+			;;
+		4)
+			install-hyprland
 			;;
 		*)
 			;;
