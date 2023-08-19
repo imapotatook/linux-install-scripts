@@ -145,24 +145,24 @@ function set-timezone {
     echo "Set your timezone "
     read -r -p "What country do you live in? (Capitalize first letter):" country
     read -r -p "What city do you live in? (Capitalize first letter):" city
-    arch-chroot /mnt bash -c "ln -sf /usr/share/zoneinfo/$country/$city /etc/localtime && exit"
+    artix-chroot /mnt bash -c "ln -sf /usr/share/zoneinfo/$country/$city /etc/localtime && exit"
     cont
 }
 
 
 function install-gnome {
-	arch-chroot /mnt bash -c "pacman -S gnome gdm-openrc gnome-tweaks papirus-icon-theme && exit"
-	arch-chroot /mnt bash -c "rc-update add gdm default && exit"
+	artix-chroot /mnt bash -c "pacman -S gnome gdm-openrc gnome-tweaks papirus-icon-theme && exit"
+	artix-chroot /mnt bash -c "rc-update add gdm default && exit"
 	# Editing gdm's config for disabling Wayland as it does not play nicely with Nvidia
-	arch-chroot /mnt bash -c "sed -i 's/#W/W/' /etc/gdm/custom.conf && exit"
+	artix-chroot /mnt bash -c "sed -i 's/#W/W/' /etc/gdm/custom.conf && exit"
 }
 function install-xfce {
-	arch-chroot /mnt bash -c "pacman -S xfce4 xfce4-goodies gstreamer0.10-base-plugins dbus gtk-engines gtk-engine-murrine gnome-themes-standard && exit" 
+	artix-chroot /mnt bash -c "pacman -S xfce4 xfce4-goodies gstreamer0.10-base-plugins dbus gtk-engines gtk-engine-murrine gnome-themes-standard && exit" 
 }
 function install-kde {
-	arch-chroot /mnt bash -c "pacman -S xorg plasma sddm sddm-openrc plasma-wayland-protocols plasma-wayland-session && exit"
-	arch-chroot /mnt bash -c "rc-update add sddm default && exit"
-	arch-chroot /mnt bash -c "pacman -S ark dolphin ffmpegthumbs libadwaita gnome-keyring gwenview kaccounts-integration kate kdialog khotkeys kio-extras ksystemlog okular print-manager pipewire alacritty latte-dock htop vscodium zsh \
+	artix-chroot /mnt bash -c "pacman -S xorg plasma sddm sddm-openrc plasma-wayland-protocols plasma-wayland-session && exit"
+	artix-chroot /mnt bash -c "rc-update add sddm default && exit"
+	artix-chroot /mnt bash -c "pacman -S ark dolphin ffmpegthumbs libadwaita gnome-keyring gwenview kaccounts-integration kate kdialog khotkeys kio-extras ksystemlog okular print-manager pipewire alacritty latte-dock htop vscodium zsh \
 	ark audiocd-kio dolphin dolphin-plugins filelight kcalc kcron kdegraphics-thumbnailers kdenetwork-filesharing kdesdk-kio kdesdk-thumbnailers kdialog \
 	kio-gdrive kompare markdownpart partitionmanager skanlite skanpage svgpart kio-zeroconf pipewire-zeroconf xdg-desktop-portal kvantum wireplumber && exit"
 }
@@ -193,7 +193,7 @@ function installgrub {
 		cont	 
 	else 
 		echo -e "Installing GRUB.."
-		arch-chroot /mnt bash -c "grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch --removable && grub-mkconfig -o /boot/grub/grub.cfg && exit"
+		artix-chroot /mnt bash -c "grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch --removable && grub-mkconfig -o /boot/grub/grub.cfg && exit"
 	fi
 	cont
 }
@@ -203,59 +203,59 @@ function archroot {
 	read -r -p "Enter the hostname: " hname
 
 	echo -e "Setting up Language\n"
-	arch-chroot /mnt bash -c "hwclock --systohc && sed -i 's/#en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen && locale-gen && echo 'LANG=en_US.UTF-8' > /etc/locale.conf && exit"
+	artix-chroot /mnt bash -c "hwclock --systohc && sed -i 's/#en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen && locale-gen && echo 'LANG=en_US.UTF-8' > /etc/locale.conf && exit"
 
 	echo -e "Setting up Hostname\n"
-	arch-chroot /mnt bash -c "echo $hname > /etc/hostname && echo 127.0.0.1	$hname > /etc/hosts && echo ::1	$hname >> /etc/hosts && echo 127.0.1.1	$hname.localdomain	$hname >> /etc/hosts && exit"
+	artix-chroot /mnt bash -c "echo $hname > /etc/hostname && echo 127.0.0.1	$hname > /etc/hosts && echo ::1	$hname >> /etc/hosts && echo 127.0.1.1	$hname.localdomain	$hname >> /etc/hosts && exit"
 
 	echo "Set Root password"
-	arch-chroot /mnt bash -c "passwd && useradd -mG wheel $uname && echo 'set user password' && passwd $uname && sed -i '85s/#/ /' /etc/sudoers && exit"
+	artix-chroot /mnt bash -c "passwd && useradd -mG wheel $uname && echo 'set user password' && passwd $uname && sed -i '85s/#/ /' /etc/sudoers && exit"
 
     echo "add btrfs module to mkinitcpio"
-    arch-chroot /mnt bash -c "sed -i '7s/(/(btrfs/' /etc/mkinitcpio.conf && mkinitcpio -P && exit"
+    artix-chroot /mnt bash -c "sed -i '7s/(/(btrfs/' /etc/mkinitcpio.conf && mkinitcpio -P && exit"
 
 	echo -e "enabling services...\n"
-	arch-chroot /mnt bash -c "rc-update add bluetooth && exit"
-	arch-chroot /mnt bash -c "rc-update add NetworkManager default && exit"
+	artix-chroot /mnt bash -c "rc-update add bluetooth && exit"
+	artix-chroot /mnt bash -c "rc-update add NetworkManager default && exit"
 	
 	#echo -e "enabling paccache timer...\n"
-	#arch-chroot /mnt bash -c "systemctl enable paccache.timer && exit"
+	#artix-chroot /mnt bash -c "systemctl enable paccache.timer && exit"
 
 	echo -e "Editing configuration files...\n"
 	# Enabling multilib in pacman
-	arch-chroot /mnt bash -c "sed -i '93s/#\[/\[/' /etc/pacman.conf && sed -i '94s/#I/I/' /etc/pacman.conf && pacman -Syu && sleep 1 && exit"
+	artix-chroot /mnt bash -c "sed -i '93s/#\[/\[/' /etc/pacman.conf && sed -i '94s/#I/I/' /etc/pacman.conf && pacman -Syu && sleep 1 && exit"
 	# Tweaking pacman, uncomment options Color, TotalDownload and VerbosePkgList
-	arch-chroot /mnt bash -c "sed -i '34s/#C/C/' /etc/pacman.conf && sed -i '35s/#T/T/' /etc/pacman.conf && sed -i '37s/#V/V/' /etc/pacman.conf && sleep 1 && exit"
+	artix-chroot /mnt bash -c "sed -i '34s/#C/C/' /etc/pacman.conf && sed -i '35s/#T/T/' /etc/pacman.conf && sed -i '37s/#V/V/' /etc/pacman.conf && sleep 1 && exit"
 
 	cont
 }
 
 function install-amd {
-	arch-chroot /mnt bash -c "pacman -S mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon && exit"
-	arch-chroot /mnt bash -c "pacman -S libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau && exit"
+	artix-chroot /mnt bash -c "pacman -S mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon && exit"
+	artix-chroot /mnt bash -c "pacman -S libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau && exit"
 }
 function install-intel {
-	arch-chroot /mnt bash -c "pacman -S mesa lib32-mesa vulkan-intel lib32-vulkan-intel && exit" 
-	arch-chroot /mnt bash -c "pacman -S libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau && exit"
+	artix-chroot /mnt bash -c "pacman -S mesa lib32-mesa vulkan-intel lib32-vulkan-intel && exit" 
+	artix-chroot /mnt bash -c "pacman -S libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau && exit"
 }
 function install-nvidia {
-	arch-chroot /mnt bash -c "pacman -S nvidia nvidia-settings nvidia-utils lib32-nvidia-utils && exit"	
+	artix-chroot /mnt bash -c "pacman -S nvidia nvidia-settings nvidia-utils lib32-nvidia-utils && exit"	
 }
 
 function install-firefox {
-	arch-chroot /mnt bash -c "pacman -S firefox && exit"
+	artix-chroot /mnt bash -c "pacman -S firefox && exit"
 }
 function install-firefoxn {
-	arch-chroot /mnt bash -c "pacman -S firefox-nightly && exit"
+	artix-chroot /mnt bash -c "pacman -S firefox-nightly && exit"
 }
 function install-librewolf {
-	arch-chroot /mnt bash -c "pacman -S librewolf && exit"
+	artix-chroot /mnt bash -c "pacman -S librewolf && exit"
 }
 function install-google {
-	arch-chroot /mnt bash -c "pacman -S google-chrome && exit"
+	artix-chroot /mnt bash -c "pacman -S google-chrome && exit"
 }
 function install-ugchromium {
-	arch-chroot /mnt bash -c "pacman -S ungoogled-chromium && exit"
+	artix-chroot /mnt bash -c "pacman -S ungoogled-chromium && exit"
 }
 
 
@@ -306,11 +306,11 @@ function graphics {
 }
 
 function paru {
-	arch-chroot /mnt bash -c "pacman -S paru && exit"
+	artix-chroot /mnt bash -c "pacman -S paru && exit"
 }
 
 function yay { 
-	arch-chroot /mnt bash -c "pacman -S yay && exit"
+	artix-chroot /mnt bash -c "pacman -S yay && exit"
 }
 
 function aur-helper {
@@ -334,7 +334,7 @@ function installsteam {
 	read -r -p "Do you want to install steam? [y/N] " isteam
 	case "$isteam" in
 		[yY][eE][sS]|[yY])
-			arch-chroot /mnt bash -c "pacman -S steam steam-native-runtime && exit"
+			artix-chroot /mnt bash -c "pacman -S steam steam-native-runtime && exit"
 			;;
 		*)
 			;;
@@ -342,7 +342,7 @@ function installsteam {
         read -r -p "Do you want to install steam tinker launch? [y/N] " stl
         case "$stl" in
 		    [yY][eE][sS]|[yY])
-		        arch-chroot /mnt bash -c "pacman -S steamtinkerlaunch && exit"
+		        artix-chroot /mnt bash -c "pacman -S steamtinkerlaunch && exit"
 			    ;;
 		    *)
 		        ;;	
@@ -366,9 +366,9 @@ function chaotic-aur {
 	if [[ $chaotic =~ ([nN][oO]|[nN])$ ]]; then
 	cont 
 	else
-	    arch-chroot /mnt bash -c "pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com && pacman-key --lsign-key FBA220DFC880C036 && exit" 
-		arch-chroot /mnt bash -c "pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst' && exit"
-		arch-chroot /mnt bash -c "echo '[chaotic-aur]' >> /etc/pacman.conf && echo Include = '/etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf && pacman -Sy && exit"
+	    artix-chroot /mnt bash -c "pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com && pacman-key --lsign-key FBA220DFC880C036 && exit" 
+		artix-chroot /mnt bash -c "pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst' && exit"
+		artix-chroot /mnt bash -c "echo '[chaotic-aur]' >> /etc/pacman.conf && echo Include = '/etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf && pacman -Sy && exit"
 	fi
 	cont
 }
