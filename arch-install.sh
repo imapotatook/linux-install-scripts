@@ -204,7 +204,7 @@ function installgrub {
 	cont
 }
 
-function archroot {
+function artixroot {
 	read -r -p "Enter the username: " uname
 	read -r -p "Enter the hostname: " hname
 
@@ -385,7 +385,7 @@ function full-installation {
 	partition
 	mounting
 	base
-	archroot
+	artixroot
 	chaotic-aur
 	aur-helper
     set-timezone
@@ -404,7 +404,7 @@ function step-installation {
 	echo "2. partioning"
 	echo "3. mounting"
 	echo "4. base installation"
-	echo "5. archroot"
+	echo "5. artixroot"
 	echo "6. adding chaotic-aur repo"
 	echo "7. installing aur helper"
     echo "8. set-timezone"
@@ -416,7 +416,7 @@ function step-installation {
 	echo "14. installing browsers"
 	read -r -p "Enter the number of step : " stepno
 
-	array=(set-time partition mounting base archroot chaotic-aur aur-helper set-timezone de installgrub graphics installsteam additional browsers)
+	array=(set-time partition mounting base artixroot chaotic-aur aur-helper set-timezone de installgrub graphics installsteam additional browsers)
 	#array=(ascii ascii ascii)
 	stepno=$((stepno-1))
 	while [ $stepno -lt ${#array[*]} ]
