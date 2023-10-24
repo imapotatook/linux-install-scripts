@@ -96,6 +96,7 @@ function base {
 	pacman -Syy	
 	pacman-key --init
 	pacman-key --populate
+	pacman -Sy artix-keyring
 	pacman -S wget --noconfirm
 	basestrap /mnt \
 				base \
