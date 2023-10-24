@@ -246,7 +246,7 @@ function install-intel {
 	artix-chroot /mnt bash -c "pacman -S libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau && exit"
 }
 function install-nvidia {
-	artix-chroot /mnt bash -c "pacman -S nvidia nvidia-settings nvidia-utils lib32-nvidia-utils && exit"	
+	artix-chroot /mnt bash -c "git clone https://github.com/Frogging-Family/nvidia-all.git && cd nvidia-all && makepkg -sif && cd .. && rm -rf nvidia-all && exit"	
 }
 
 function install-firefox {
