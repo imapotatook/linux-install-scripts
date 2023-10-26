@@ -93,10 +93,10 @@ function mounting {
 function base {
 	echo "Starting installation of packages in selected root drive..."
 	sleep 1
-	pacman -Syy	
+	pacman -Sy	
 	pacman-key --init
 	pacman-key --populate
-	pacman -Sy artix-keyring
+	pacman -Sy artix-keyring --noconfirm
 	pacman -S wget --noconfirm
 	basestrap /mnt \
 				base \
@@ -393,24 +393,24 @@ Include = /etc/pacman.d/mirrorlist-arch
 Include = /etc/pacman.d/mirrorlist-arch 
 
 [universe]
-Server = https://mirror.pascalpuffke.de/artix-universe/$arch
-Server = https://mirrors.qontinuum.space/artixlinux-universe/$arch
-Server = https://mirror1.cl.netactuate.com/artix/universe/$arch
-Server = https://ftp.crifo.org/artix-universe/$arch
-Server = https://artix.sakamoto.pl/universe/$arch
-Server = https://mirror1.artixlinux.org/universe/$arch
-Server = https://universe.artixlinux.org/$arch
+Server = https://mirror.pascalpuffke.de/artix-universe/\$arch
+Server = https://mirrors.qontinuum.space/artixlinux-universe/\$arch
+Server = https://mirror1.cl.netactuate.com/artix/universe/\$arch
+Server = https://ftp.crifo.org/artix-universe/\$arch
+Server = https://artix.sakamoto.pl/universe/\$arch
+Server = https://mirror1.artixlinux.org/universe/\$arch
+Server = https://universe.artixlinux.org/\$arch
 # TOR
-Server = http://rrtovkpcaxl6s2ommj5tigyxamzxaknasd74ecb5t5cdfnkodirjnwyd.onion/artixlinux/$arch
+Server = http://rrtovkpcaxl6s2ommj5tigyxamzxaknasd74ecb5t5cdfnkodirjnwyd.onion/artixlinux/\$arch
 
 [omniverse]
-Server = https://artix.sakamoto.pl/omniverse/$arch
-Server = https://eu-mirror.artixlinux.org/omniverse/$arch
-Server = https://omniverse.artixlinux.org/$arch" >> /mnt/etc/pacman.conf
+Server = https://artix.sakamoto.pl/omniverse/\$arch
+Server = https://eu-mirror.artixlinux.org/omniverse/\$arch
+Server = https://omniverse.artixlinux.org/\$arch" >> /mnt/etc/pacman.conf
 
-artix-chroot /mnt bash -c "pacman -S artix-archlinux-support && pacman -Sy && exit"
 wget https://github.com/archlinux/svntogit-packages/raw/packages/pacman-mirrorlist/trunk/mirrorlist -O /mnt/etc/pacman.d/mirrorlist-arch
 nano /mnt/etc/pacman.d/mirrorlist-arch
+artix-chroot /mnt bash -c "pacman -Sy && pacman -S artix-archlinux-support --noconfirm && pacman-key --populate archlinux && exit"
 }
 
 
